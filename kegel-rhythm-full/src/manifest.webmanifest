@@ -1,0 +1,35 @@
+{
+  "name": "提肛节拍 · 自定义节奏提醒",
+  "short_name": "提肛节拍",
+  "description": "自定义收缩与放松节奏，按时间段提醒，跟着动画节拍完成每一次盆底肌练习，并记录坚持天数。",
+  "id": "/kegel-rhythm/",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#070F0D",
+  "theme_color": "#08110F",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "categories": ["health", "lifestyle", "fitness"],
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "开始一组练习",
+      "short_name": "开始练习",
+      "url": "./index.html?go=start",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "调整提醒时间",
+      "short_name": "提醒",
+      "url": "./index.html?tab=remind",
+      "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

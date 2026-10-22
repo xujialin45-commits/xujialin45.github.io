@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#08110F" />
+<meta name="description" content="提肛节拍：自定义收缩/放松节奏与提醒时间，跟着动画节拍完成每一次练习，并记录坚持天数。" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="提肛节拍" />
+<title>提肛节拍 · 按自己的节奏坚持</title>
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="icon" href="./icons/icon-192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="./icons/icon-192.png" />
+<link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+
+<div class="app" id="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3c3.2 2.6 5 5.6 5 9a5 5 0 0 1-10 0c0-3.4 1.8-6.4 5-9Z"/>
+          <path d="M12 9v6"/><path d="M9.6 11.4 12 13.8l2.4-2.4"/>
+        </svg>
+      </span>
+      <div class="brand-text">
+        <strong>提肛节拍</strong>
+        <span id="brandSub">按自己的节奏，悄悄变好</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="ghost-btn" id="btnInstall" hidden>安装</button>
+      <div class="streak-pill" id="streakPill" title="连续天数">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 3c2.6 3 4 5.2 4 7.6a4 4 0 0 1-8 0C8 8.2 9.4 6 12 3Z"/><path d="M12 21c-3.3 0-6-2.3-6-5.2 0-1.3.5-2.5 1.3-3.6"/><path d="M12 21c3.3 0 6-2.3 6-5.2 0-1.3-.5-2.5-1.3-3.6"/></svg>
+        <b id="streakNum">0</b><span>天</span>
+      </div>
+    </div>
+  </header>
+
+  <main id="view" class="view" aria-live="polite"></main>
+
+  <nav class="tabbar" id="tabbar" aria-label="主导航">
+    <button class="tab is-active" data-tab="train">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.5 16 12l-6 3.5Z"/></svg>
+      <span>练习</span>
+    </button>
+    <button class="tab" data-tab="rhythm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10"/><path d="M18 7h2"/><circle cx="16" cy="7" r="2"/><path d="M4 17h4"/><path d="M12 17h8"/><circle cx="10" cy="17" r="2"/></svg>
+      <span>节奏</span>
+    </button>
+    <button class="tab" data-tab="remind">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 5-2 6.5-2 6.5h16S18 13 18 8Z"/><path d="M10.3 19a2 2 0 0 0 3.4 0"/></svg>
+      <span>提醒</span>
+    </button>
+    <button class="tab" data-tab="stats">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg>
+      <span>记录</span>
+    </button>
+  </nav>
+</div>
+
+<!-- 引导练习全屏层 -->
+<div class="guide" id="guide" hidden>
+  <div class="guide-bg" id="guideBg"></div>
+  <header class="guide-top">
+    <button class="icon-btn" id="btnExitGuide" data-act="exitGuide" aria-label="退出练习">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="guide-progress" id="guideProgress">第 1 组 · 第 1 次</div>
+    <button class="icon-btn" id="btnMute" data-act="mute" aria-label="声音开关">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" id="muteIcon"><path d="M11 5 6 9H3v6h3l5 4Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+    </button>
+  </header>
+
+  <div class="guide-stage">
+    <div class="stage-ring">
+      <svg class="ring" id="stageRing" viewBox="0 0 300 300" aria-hidden="true">
+        <circle class="ring-track" cx="150" cy="150" r="138"/>
+        <circle class="ring-bar" id="stageBar" cx="150" cy="150" r="138"/>
+      </svg>
+      <div class="orb-wrap">
+        <div class="orb-halo" id="orbHalo"></div>
+        <div class="orb" id="orb">
+          <div class="orb-core">
+            <span class="orb-count" id="orbCount">5</span>
+            <span class="orb-sub" id="orbSub">准备好了吗</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phase-text">
+      <h2 id="phaseTitle">准备</h2>
+      <p id="phaseHint">坐直或平躺，放松肩膀，做一次自然的呼吸。</p>
+    </div>
+
+    <div class="rep-dots" id="repDots" aria-hidden="true"></div>
+  </div>
+
+  <footer class="guide-bottom">
+    <div class="guide-total"><span id="guideElapsed">00:00</span> / <span id="guideTotal">00:00</span></div>
+    <div class="guide-actions">
+      <button class="pill-btn" id="btnSkip" data-act="skip">跳过</button>
+      <button class="pill-btn primary" id="btnPause" data-act="pause">暂停</button>
+      <button class="pill-btn" id="btnStop" data-act="stop">结束</button>
+    </div>
+  </footer>
+</div>
+
+<!-- 完成页 -->
+<div class="modal" id="doneModal" hidden>
+  <div class="modal-card done-card">
+    <div class="done-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m4 12.5 5 5L20 6.5"/></svg>
+    </div>
+    <h2 id="doneTitle">这一组完成了</h2>
+    <p class="muted" id="doneSub">你已经完成今天的练习。</p>
+    <div class="done-grid">
+      <div><b id="doneReps">0</b><span>次收缩</span></div>
+      <div><b id="doneTime">0:00</b><span>用时</span></div>
+      <div><b id="doneStreak">0</b><span>连续天</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="btnDoneClose">关闭</button>
+      <button class="btn primary" id="btnAgain">再来一组</button>
+    </div>
+  </div>
+</div>
+
+<!-- 提醒浮层 -->
+<div class="toast" id="toast" hidden>
+  <div class="toast-body">
+    <span class="toast-dot"></span>
+    <div>
+      <b id="toastTitle">该练习了</b>
+      <p id="toastText">跟着节拍做一组，20 次就好。</p>
+    </div>
+  </div>
+  <div class="toast-actions">
+    <button class="btn tiny ghost" id="toastLater" data-act="toastLater">稍后</button>
+    <button class="btn tiny primary" id="toastStart" data-act="toastStart">开始</button>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" data-act="scrimClose" hidden></div>
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h3 id="sheetTitle">设置</h3>
+    <button class="icon-btn" id="sheetClose" data-act="sheetClose" aria-label="关闭">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </div>
+  <div class="sheet-body" id="sheetBody"></div>
+</div>
+
+<script src="./js/core.js"></script>
+<script src="./js/app.js"></script>
+</body>
+</html>
